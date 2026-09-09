@@ -1,0 +1,15 @@
+services:
+  pos-reporting:
+    build: .
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./app/logs:/app/app/logs
+    command: >
+      sh -c "gunicorn --bind 0.0.0.0:5000 --workers 1 --timeout 600 --reload app.main:app"
+    restart: unless-stopped

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RestoReport — Admin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #fffaf5;
+    --bg-soft: #fff2e8;
+    --panel: rgba(255,255,255,0.96);
+    --border: #f1d2b5;
+    --text: #2e1f1a;
+    --muted: #7a5b4d;
+    --primary: #f57c22;
+    --primary-strong: #dd6610;
+    --primary-soft: rgba(245,124,34,0.12);
+    --success: #1d8a68;
+    --shadow: 0 18px 42px rgba(88, 52, 30, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 18px 48px;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    color: var(--text);
+    line-height: 1.5;
+    background: radial-gradient(circle at top left, rgba(245,124,34,0.10), transparent 26%), linear-gradient(180deg, #fffaf5 0%, #fff2e8 100%);
+  }
+
+  .shell { max-width: 980px; margin: 0 auto; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 16px 18px; margin-bottom: 18px; background: rgba(255,255,255,0.8);
+    border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 10px 24px rgba(120, 67, 27, 0.05);
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-strong);
+  }
+  .brand-mark {
+    width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; font-size: 0.8rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), #ffad5c); color: white; box-shadow: 0 10px 22px rgba(245,124,34,0.18);
+  }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+  .nav a {
+    text-decoration: none; color: var(--muted); border: 1px solid var(--border); background: #fff; padding: 9px 12px; border-radius: 12px; font-size: 0.78rem; font-weight: 700;
+  }
+  .user-pill {
+    display: inline-flex; align-items: center; padding: 9px 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-strong); border: 1px solid rgba(245,124,34,0.14); font-size: 0.8rem; font-weight: 700;
+  }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); padding: 24px;
+  }
+  h1 {
+    margin: 0 0 18px; font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.05em; color: var(--primary-strong);
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 20px 0;
+  }
+  .card {
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 18px; padding: 18px 16px;
+  }
+  .label { display: block; color: var(--muted); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .value { display: block; font-weight: 800; font-size: 1.7rem; color: var(--primary-strong); margin-top: 8px; }
+  .status {
+    display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+  }
+  .ok { background: rgba(29,138,104,0.10); color: var(--success); }
+  .warn { background: rgba(245,124,34,0.10); color: var(--primary-strong); }
+  .rule { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+  a.button, button {
+    text-decoration: none; border: none; border-radius: 12px; padding: 12px 16px; font-size: 0.86rem; font-weight: 800; cursor: pointer;
+  }
+  a.button.primary, button.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong)); color: white; box-shadow: 0 12px 26px rgba(245,124,34,0.22);
+  }
+  a.button.secondary {
+    border: 1px solid rgba(245,124,34,0.25); background: transparent; color: var(--primary-strong);
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">R</span> RestoReport</div>
+      <div class="nav">
+        <a href="/">Accueil</a>
+        <a href="/historique">Historique</a>
+        <a href="/admin/utilisateurs">Utilisateurs</a>
+        <a href="/admin/parametres">Paramètres IA</a>
+        <a href="/logout">Déconnexion</a>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="user-pill">Connecté : {{ user }}</div>
+      <h1>Tableau de bord admin</h1>
+
+      <div class="grid">
+        <div class="card"><span class="label">Utilisateurs</span><span class="value">{{ total_utilisateurs }}</span></div>
+        <div class="card"><span class="label">Actifs</span><span class="value">{{ utilisateurs_actifs }}</span></div>
+        <div class="card"><span class="label">Rapports</span><span class="value">{{ total_rapports }}</span></div>
+        <div class="card"><span class="label">Dernier rapport</span><span class="value" style="font-size:1.2rem;">{{ dernier_rapport }}</span></div>
+      </div>
+
+      <hr class="rule">
+
+      <div class="grid">
+        <div class="card"><span class="label">Fournisseur IA</span><span class="value" style="font-size:1.2rem;">{{ provider_actif }}</span></div>
+        <div class="card"><span class="label">Gemini</span><span class="status {{ 'ok' if gemini_config else 'warn' }}">{{ 'Configurée' if gemini_config else 'Clé absente' }}</span></div>
+        <div class="card"><span class="label">OpenAI</span><span class="status {{ 'ok' if openai_config else 'warn' }}">{{ 'Configurée' if openai_config else 'Clé absente' }}</span></div>
+      </div>
+
+      <div class="actions">
+        <a class="button primary" href="/admin/utilisateurs">Gérer les utilisateurs</a>
+        <a class="button secondary" href="/admin/parametres">Paramètres IA</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

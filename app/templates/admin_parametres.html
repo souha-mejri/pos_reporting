@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RestoReport — Paramètres IA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #fffaf5;
+    --bg-soft: #fff2e8;
+    --panel: rgba(255,255,255,0.96);
+    --border: #f1d2b5;
+    --text: #2d1f1a;
+    --muted: #7a5b4d;
+    --primary: #f57c22;
+    --primary-strong: #dd6610;
+    --primary-soft: rgba(245,124,34,0.12);
+    --shadow: 0 18px 42px rgba(88, 52, 30, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 30px 18px 50px;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top left, rgba(245,124,34,0.10), transparent 26%), linear-gradient(180deg, #fffaf5 0%, #fff2e8 100%);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .shell { width: min(100%, 860px); margin: 0 auto; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 20px; padding: 14px 18px; background: rgba(255,255,255,0.8);
+    border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 10px 24px rgba(120, 67, 27, 0.05);
+  }
+  .brand {
+    display: inline-flex; align-items: center; gap: 10px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary-strong);
+  }
+  .brand-mark {
+    width: 28px; height: 28px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--primary), #ffad5c); color: white; font-weight: 800; font-size: 0.8rem;
+  }
+  .nav { display: flex; gap: 10px; flex-wrap: wrap; }
+  .nav a {
+    text-decoration: none; color: var(--muted); border: 1px solid var(--border); background: #fff; padding: 8px 12px; border-radius: 10px; font-size: 0.78rem; font-weight: 700;
+  }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 24px; box-shadow: var(--shadow); padding: 24px;
+  }
+  h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 4vw, 2.4rem); letter-spacing: -0.05em; color: var(--primary-strong); }
+  .subtitle { margin: 0 0 18px; color: var(--muted); }
+  .msg {
+    background: rgba(29,138,104,0.08); border: 1px solid rgba(29,138,104,0.12); border-radius: 12px; color: #1d8a68; padding: 10px 12px; margin-bottom: 18px; font-size: 0.88rem; font-weight: 700;
+  }
+  form { display: grid; gap: 18px; }
+  .field {
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 18px; padding: 16px;
+  }
+  label {
+    display: block; margin-bottom: 8px; color: var(--muted); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  select, input {
+    width: 100%; border: 1px solid rgba(245,124,34,0.28); border-radius: 12px; padding: 12px 14px; font-size: 0.96rem; background: #fff; color: var(--text);
+  }
+  select:focus, input:focus { outline: none; border-color: rgba(245,124,34,0.7); box-shadow: 0 0 0 4px rgba(245,124,34,0.10); }
+  .current { margin-top: 8px; font-size: 0.8rem; color: var(--muted); }
+  .btn {
+    border: none; border-radius: 12px; background: linear-gradient(135deg, var(--primary), var(--primary-strong)); color: white; padding: 12px 18px; font-size: 0.95rem; font-weight: 800; cursor: pointer; box-shadow: 0 14px 28px rgba(245,124,34,0.22);
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark">R</span> RestoReport</div>
+      <div class="nav">
+        <a href="/admin">Tableau de bord</a>
+        <a href="/">Accueil</a>
+        <a href="/admin/utilisateurs">Utilisateurs</a>
+        <a href="/logout">Déconnexion</a>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h1>Paramètres IA</h1>
+      <p class="subtitle">Configurez le fournisseur intelligent et les accès API pour vos analyses.</p>
+
+      {% if message %}<div class="msg">{{ message }}</div>{% endif %}
+
+      <form method="POST">
+        <div class="field">
+          <label>Fournisseur IA actif</label>
+          <select name="ai_provider">
+            <option value="gemini" {{ 'selected' if fournisseur_actif == 'gemini' else '' }}>Gemini (Google)</option>
+            <option value="openai" {{ 'selected' if fournisseur_actif == 'openai' else '' }}>OpenAI</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Clé API Gemini</label>
+          <input type="password" name="gemini_api_key" placeholder="Laisser vide pour ne pas changer">
+          <div class="current">Clé actuelle : {{ gemini_masquee }}</div>
+        </div>
+
+        <div class="field">
+          <label>Clé API OpenAI</label>
+          <input type="password" name="openai_api_key" placeholder="Laisser vide pour ne pas changer">
+          <div class="current">Clé actuelle : {{ openai_masquee }}</div>
+        </div>
+
+        <button class="btn" type="submit">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

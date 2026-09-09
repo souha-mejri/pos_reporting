@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # ==========================================
+  # 1. Tests automatiques
+  # ==========================================
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer les dépendances
+        run: pip install -r requirements-dev.txt
+
+      - name: Lancer les tests
+        run: pytest -v
+
+  # ==========================================
+  # 2. Build + publication de l'image Docker
+  #    (seulement si les tests passent, et seulement sur push, pas sur PR)
+  # ==========================================
+  build-image:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construire l'image Docker
+        run: docker build -t pos-reporting:${{ github.sha }} .
+
+      - name: Se connecter à GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calculer le nom d'image en minuscules (obligatoire pour GHCR)
+        run: echo "IMAGE=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+      - name: Taguer et publier l'image
+        run: |
+          docker tag pos-reporting:${{ github.sha }} ${{ env.IMAGE }}:latest
+          docker tag pos-reporting:${{ github.sha }} ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:latest
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
+
+  # ==========================================
+  # 3. Déploiement sur le serveur
+  #    ⚠️ DÉSACTIVÉ tant qu'aucun serveur n'est disponible.
+  #    Une fois le serveur prêt :
+  #      1. Passer `if: false` à `if: github.event_name == 'push'`
+  #      2. Ajouter les secrets du repo GitHub (Settings > Secrets > Actions) :
+  #         SERVER_HOST, SERVER_USER, SERVER_SSH_KEY
+  #      3. Compléter l'étape SSH ci-dessous (ex: docker compose pull && up -d
+  #         sur le serveur, via une action comme appleboy/ssh-action)
+  # ==========================================
+  deploy:
+    needs: build-image
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - name: Déploiement (à compléter)
+        run: echo "Étape à activer une fois le serveur disponible."

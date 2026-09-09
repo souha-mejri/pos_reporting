@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Historique — Rapport Marketing POS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root{
+    --paper:#FAF7F0;
+    --ink:#2B2622;
+    --ink-soft:#5C5330;
+    --line:#D8D0C2;
+    --amber:#B9781F;
+    --amber-dark:#8F5B14;
+    --sage:#6B7A5E;
+    --orange-soft:#fff1e6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:40px 16px 80px;
+    background:
+      radial-gradient(circle at top left, rgba(185,120,31,0.08), transparent 30%),
+      repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(0,0,0,0.02) 28px);
+    background-color:var(--paper);
+    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    color:var(--ink);
+    line-height:1.5;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .ticket{
+    width:100%;
+    max-width:620px;
+    background:#FFFEFB;
+    border:1px solid var(--line);
+    box-shadow: 0 2px 0 var(--line), 0 14px 30px -18px rgba(43,38,34,0.35);
+    padding:32px 28px;
+    position:relative;
+  }
+  .ticket::before, .ticket::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    height:10px;
+    background-image: radial-gradient(circle at 8px 5px, var(--paper) 5px, transparent 5.5px);
+    background-size:16px 10px;
+    background-repeat:repeat-x;
+  }
+  .ticket::before{ top:-5px; }
+  .ticket::after{ bottom:-5px; transform:rotate(180deg); }
+
+  .nav{ text-align:center; margin-bottom:16px; }
+  .nav a{
+    color:var(--sage);
+    text-decoration:none;
+    font-size:0.82rem;
+    border-bottom:1px dashed var(--sage);
+  }
+  .nav a:hover{ color:var(--amber-dark); border-color:var(--amber-dark); }
+
+  h1{
+    font-size:1.5rem;
+    letter-spacing:0.04em;
+    text-align:center;
+    margin:0 0 4px;
+  }
+  .sub{
+    text-align:center;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin:0 0 20px;
+  }
+  .rule{
+    border:none;
+    border-top:1px dashed var(--line);
+    margin:18px 0;
+  }
+
+  .selecteur{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    margin:18px 0 6px;
+    flex-wrap:wrap;
+  }
+  select{
+    font-family:inherit;
+    font-size:0.92rem;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    min-width:200px;
+  }
+  button{
+    font-family:inherit;
+    font-size:0.95rem;
+    letter-spacing:0.03em;
+    padding:12px 26px;
+    border:1px solid var(--amber-dark);
+    background:var(--amber);
+    color:#fff;
+    cursor:pointer;
+    transition: transform .12s ease, background .12s ease;
+  }
+  button:hover:not(:disabled){ background:var(--amber-dark); }
+  button:active:not(:disabled){ transform: translateY(1px); }
+  button:disabled{ opacity:0.5; cursor:progress; }
+  button.secondary{
+    background:transparent;
+    color:var(--sage);
+    border-color:var(--sage);
+  }
+  button.secondary:hover:not(:disabled){ background:var(--sage); color:#fff; }
+
+  #statut{
+    text-align:center;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    min-height:1.2em;
+    margin-top:10px;
+  }
+  #resultat{ margin-top:10px; display:none; }
+  .meta{
+    text-align:center;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .section{ margin-bottom:22px; }
+  .section h2{
+    font-size:0.95rem;
+    letter-spacing:0.03em;
+    margin:0 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section h2::before{ content:"»"; color:var(--amber-dark); }
+  .section .contenu{
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size:0.92rem;
+    line-height:1.55;
+    color:#3A342C;
+    white-space:pre-wrap;
+  }
+  .pdf-actions{ display:flex; justify-content:center; margin-top:24px; }
+</style>
+</head>
+<body>
+
+  <div class="ticket">
+    <div class="nav"><a href="/">← Générer un nouveau rapport</a></div>
+
+    <h1>HISTORIQUE</h1>
+    <p class="sub">Rapports générés automatiquement chaque jour</p>
+    <hr class="rule">
+
+    <div class="selecteur">
+      <select id="selectDate"><option value="">Chargement des dates...</option></select>
+      <button id="btnCharger">Afficher</button>
+    </div>
+    <div id="statut"></div>
+
+    <div id="resultat">
+      <hr class="rule">
+      <p class="meta" id="metaCommandes"></p>
+      <div id="sections"></div>
+      <hr class="rule">
+      <div class="pdf-actions">
+        <button id="btnPdf" class="secondary">Télécharger en PDF</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const selectDate = document.getElementById('selectDate');
+const btnCharger = document.getElementById('btnCharger');
+const btnPdf = document.getElementById('btnPdf');
+const statut = document.getElementById('statut');
+const resultat = document.getElementById('resultat');
+const sectionsDiv = document.getElementById('sections');
+const metaCommandes = document.getElementById('metaCommandes');
+
+let dernieresSections = null;
+let dernierNombreCommandes = null;
+
+(async () => {
+  try {
+    const reponse = await fetch('/rapports');
+    const data = await reponse.json();
+    selectDate.innerHTML = '';
+    if (!data.dates || data.dates.length === 0) {
+      selectDate.innerHTML = '<option value="">Aucun rapport disponible</option>';
+      return;
+    }
+    data.dates.forEach(date => {
+      const option = document.createElement('option');
+      option.value = date;
+      option.textContent = date;
+      selectDate.appendChild(option);
+    });
+  } catch (e) {
+    selectDate.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+})();
+
+async function afficherRapport(date) {
+  if (!date) return;
+  btnCharger.disabled = true;
+  resultat.style.display = 'none';
+  statut.textContent = 'Chargement...';
+
+  try {
+    const reponse = await fetch(`/rapports/${date}`);
+    if (!reponse.ok) {
+      const err = await reponse.json().catch(() => ({}));
+      throw new Error(err.erreur || `Erreur serveur (${reponse.status})`);
+    }
+    const data = await reponse.json();
+
+    dernieresSections = data.sections;
+    dernierNombreCommandes = data.nombre_commandes_analysees;
+
+    metaCommandes.textContent = `${data.nombre_commandes_analysees} commandes analysées — généré le ${data.genere_le}`;
+    sectionsDiv.innerHTML = '';
+
+    data.sections.forEach(section => {
+      const div = document.createElement('div');
+      div.className = 'section';
+      const h2 = document.createElement('h2');
+      h2.textContent = section.titre;
+      const contenu = document.createElement('div');
+      contenu.className = 'contenu';
+      contenu.textContent = section.contenu || '(aucun contenu généré ce jour-là)';
+      div.appendChild(h2);
+      div.appendChild(contenu);
+      sectionsDiv.appendChild(div);
+    });
+
+    resultat.style.display = 'block';
+    statut.textContent = '';
+  } catch (e) {
+    statut.textContent = "Erreur : " + e.message;
+  } finally {
+    btnCharger.disabled = false;
+  }
+}
+
+btnCharger.addEventListener('click', () => afficherRapport(selectDate.value));
+
+btnPdf.addEventListener('click', async () => {
+  if (!dernieresSections) return;
+  btnPdf.disabled = true;
+  const texteOriginal = btnPdf.textContent;
+  btnPdf.textContent = 'Génération du PDF...';
+
+  try {
+    const reponse = await fetch('/rapport-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sections: dernieresSections, nombre_commandes: dernierNombreCommandes })
+    });
+    if (!reponse.ok) throw new Error('Impossible de générer le PDF');
+    const blob = await reponse.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport_${selectDate.value}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (e) {
+    alert(e.message);
+  } finally {
+    btnPdf.disabled = false;
+    btnPdf.textContent = texteOriginal;
+  }
+});
+</script>
+
+</body>
+</html>

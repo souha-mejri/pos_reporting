@@ -1,0 +1,83 @@
+[
+  {
+    "ID_AUTO": 13566, "Idvent": "1", "ID_SOCITEE": "LBMS", "ID_MAGACIN": "LBMS",
+    "DATE": "20260717", "CAISSIER": "ADMIN", "CAISSE": "1",
+    "INFORMATION_COMMANDE": {
+      "DATE_Commande": "2026-07-17", "Heure_Commande": "17:55:59.200",
+      "NUMVEN": 1, "MONVEN": 48.1, "NETVEN": 48.1, "MONREM": 0,
+      "COMMANDE_ANNULER": true, "ORIGINE_COMMANDE": "Caisse",
+      "TYPCOM": 3, "AdresseLivrison": "3 boulevard test",
+      "tabReglement": [],
+      "tabProduit": [
+        {"IdProduit": "7", "NomProduit": "REINE JUNIOR", "Quantite": 1, "moNetVente": 9},
+        {"IdProduit": "429", "NomProduit": "COCA COLA 33CL", "Quantite": 1, "moNetVente": 1.5}
+      ]
+    }
+  },
+  {
+    "ID_AUTO": 13572, "Idvent": "10", "ID_SOCITEE": "LBMS", "ID_MAGACIN": "LBMS",
+    "DATE": "20260717", "CAISSIER": "ADMIN", "CAISSE": "1",
+    "INFORMATION_COMMANDE": {
+      "DATE_Commande": "2026-07-17", "Heure_Commande": "20:44:17.370",
+      "NUMVEN": 10, "MONVEN": 26.2, "NETVEN": 26.2, "MONREM": 0,
+      "COMMANDE_ANNULER": false, "ORIGINE_COMMANDE": "Caisse",
+      "TYPCOM": 3, "AdresseLivrison": "2 Chemin test",
+      "tabReglement": [{"MontantReglee": 26.2, "Code": "ES", "NomReglement": "ES"}],
+      "tabProduit": [
+        {"IdProduit": "379", "NomProduit": "MENU DOUBLE CHEESE BURGER", "Quantite": 1, "moNetVente": 5.9},
+        {"IdProduit": "302", "NomProduit": "MENU SANDWICH LE RADICAL", "Quantite": 1, "moNetVente": 8.5}
+      ]
+    }
+  },
+  {
+    "ID_AUTO": 13821, "Idvent": "100", "ID_SOCITEE": "LBMS", "ID_MAGACIN": "LBMS",
+    "DATE": "20260723", "CAISSIER": "ADMIN", "CAISSE": "1",
+    "INFORMATION_COMMANDE": {
+      "DATE_Commande": "2026-07-23", "Heure_Commande": "19:14:34.820",
+      "NUMVEN": 100, "MONVEN": 39, "NETVEN": 39, "MONREM": 0,
+      "COMMANDE_ANNULER": false, "ORIGINE_COMMANDE": "Caisse",
+      "TYPCOM": 3, "AdresseLivrison": "69 Rue de Guise",
+      "tabReglement": [{"MontantReglee": 78, "Code": "ES", "NomReglement": "ES"}],
+      "tabProduit": []
+    }
+  },
+  {
+    "ID_AUTO": 13828, "Idvent": "102", "ID_SOCITEE": "LBMS", "ID_MAGACIN": "LBMS",
+    "DATE": "20260723", "CAISSIER": "ADMIN", "CAISSE": "1",
+    "INFORMATION_COMMANDE": {
+      "DATE_Commande": "2026-07-23", "Heure_Commande": "19:36:22.230",
+      "NUMVEN": 102, "MONVEN": 27, "NETVEN": 20.5, "MONREM": 6.5,
+      "COMMANDE_ANNULER": false, "ORIGINE_COMMANDE": "Caisse",
+      "TYPCOM": 2, "AdresseLivrison": "",
+      "tabReglement": [{"MontantReglee": 41, "Code": "ES", "NomReglement": "ES"}],
+      "tabProduit": []
+    }
+  },
+  {
+    "ID_AUTO": 13716, "Idvent": "80", "ID_SOCITEE": "LBMS", "ID_MAGACIN": "LBMS",
+    "DATE": "20260721", "CAISSIER": "ADMIN", "CAISSE": "1",
+    "INFORMATION_COMMANDE": {
+      "DATE_Commande": "2026-07-21", "Heure_Commande": "19:47:36.430",
+      "NUMVEN": 80, "MONVEN": 28.5, "NETVEN": 22, "MONREM": 6.5,
+      "COMMANDE_ANNULER": false, "ORIGINE_COMMANDE": "Caisse",
+      "TYPCOM": 2, "AdresseLivrison": "",
+      "tabReglement": [
+        {"MontantReglee": 12, "Code": "ES", "NomReglement": "ES"},
+        {"MontantReglee": 32, "Code": "CB", "NomReglement": "CB"}
+      ],
+      "tabProduit": []
+    }
+  },
+  {
+    "ID_AUTO": 13898, "Idvent": "117", "ID_SOCITEE": "LBMS", "ID_MAGACIN": "LBMS",
+    "DATE": "20260724", "CAISSIER": "ADMIN", "CAISSE": "1",
+    "INFORMATION_COMMANDE": {
+      "DATE_Commande": "2026-07-24", "Heure_Commande": "21:19:54.740",
+      "NUMVEN": 117, "MONVEN": 20, "NETVEN": 20, "MONREM": 0,
+      "COMMANDE_ANNULER": false, "ORIGINE_COMMANDE": "Caisse",
+      "TYPCOM": 1, "AdresseLivrison": "",
+      "tabReglement": [{"MontantReglee": 40, "Code": "ES", "NomReglement": "ES"}],
+      "tabProduit": []
+    }
+  }
+]
