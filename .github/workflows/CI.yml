@@ -71,12 +71,10 @@ jobs:
   #         sur le serveur, via une action comme appleboy/ssh-action)
   # ==========================================
   deploy:
-    needs: build-image
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - name: Déploiement (à compléter)
-        run: echo "Étape à activer une fois le serveur disponible."
+  needs: build-image
+  runs-on: ubuntu-latest
+  if: false
+  ...
         
           # ==========================================
   # 3. Test du Self-hosted Runner + Kubernetes
@@ -96,3 +94,27 @@ jobs:
 
           echo "=== Pods Calico ==="
           kubectl get pods -n kube-system -l k8s-app=calico-node
+            # ==========================================
+  # 4. Déploiement automatique sur Kubernetes
+  # ==========================================
+  deploy:
+    needs: build-image
+    runs-on: self-hosted
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Vérifier le cluster Kubernetes
+        run: kubectl get nodes
+
+      - name: Déployer la nouvelle image
+        run: |
+          kubectl -n pos-reporting set image deployment/pos-reporting \
+            pos-reporting=ghcr.io/souha-mejri/pos_reporting:${{ github.sha }}
+
+      - name: Attendre le déploiement
+        run: |
+          kubectl -n pos-reporting rollout status deployment/pos-reporting --timeout=180s
+
+      - name: Vérifier le pod
+        run: |
+          kubectl -n pos-reporting get pods -o wide
