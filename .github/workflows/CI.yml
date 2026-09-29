@@ -77,3 +77,22 @@ jobs:
     steps:
       - name: Déploiement (à compléter)
         run: echo "Étape à activer une fois le serveur disponible."
+        
+          # ==========================================
+  # 3. Test du Self-hosted Runner + Kubernetes
+  # ==========================================
+  test-kubernetes:
+    needs: build-image
+    runs-on: [self-hosted, Linux, X64]
+    if: github.event_name == 'push'
+    steps:
+      - name: Vérifier Kubernetes
+        run: |
+          echo "=== Version kubectl ==="
+          kubectl version --client
+
+          echo "=== Nœuds Kubernetes ==="
+          kubectl get nodes -o wide
+
+          echo "=== Pods Calico ==="
+          kubectl get pods -n kube-system -l k8s-app=calico-node
