@@ -7,11 +7,13 @@ on:
     branches: ["main"]
 
 jobs:
+
   # ==========================================
   # 1. Tests automatiques
   # ==========================================
   test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,17 +28,19 @@ jobs:
       - name: Lancer les tests
         run: pytest -v
 
+
   # ==========================================
   # 2. Build + publication de l'image Docker
-  #    (seulement si les tests passent, et seulement sur push, pas sur PR)
   # ==========================================
   build-image:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+
     permissions:
       contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -50,67 +54,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Calculer le nom d'image en minuscules (obligatoire pour GHCR)
-        run: echo "IMAGE=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+      - name: Calculer le nom de l'image
+        run: |
+          echo "IMAGE=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - name: Taguer et publier l'image
         run: |
           docker tag pos-reporting:${{ github.sha }} ${{ env.IMAGE }}:latest
           docker tag pos-reporting:${{ github.sha }} ${{ env.IMAGE }}:${{ github.sha }}
+
           docker push ${{ env.IMAGE }}:latest
           docker push ${{ env.IMAGE }}:${{ github.sha }}
 
+
   # ==========================================
-  # 3. Déploiement sur le serveur
-  #    ⚠️ DÉSACTIVÉ tant qu'aucun serveur n'est disponible.
-  #    Une fois le serveur prêt :
-  #      1. Passer `if: false` à `if: github.event_name == 'push'`
-  #      2. Ajouter les secrets du repo GitHub (Settings > Secrets > Actions) :
-  #         SERVER_HOST, SERVER_USER, SERVER_SSH_KEY
-  #      3. Compléter l'étape SSH ci-dessous (ex: docker compose pull && up -d
-  #         sur le serveur, via une action comme appleboy/ssh-action)
-  # ==========================================
-  deploy:
-    needs: build-image
-    runs-on: self-hosted
-    if: github.event_name == 'push'
-    steps:
-      - name: Vérifier le cluster Kubernetes
-        run: kubectl get nodes
-
-      - name: Déployer la nouvelle image
-        run: |
-          kubectl -n pos-reporting set image deployment/pos-reporting \
-            pos-reporting=ghcr.io/souha-mejri/pos_reporting:${{ github.sha }}
-
-      - name: Attendre le déploiement
-        run: |
-          kubectl -n pos-reporting rollout status deployment/pos-reporting --timeout=180s
-
-      - name: Vérifier le pod
-        run: |
-          kubectl -n pos-reporting get pods -o wide
-        
-          # ==========================================
-  # 3. Test du Self-hosted Runner + Kubernetes
-  # ==========================================
-  test-kubernetes:
-    needs: build-image
-    runs-on: [self-hosted, Linux, X64]
-    if: github.event_name == 'push'
-    steps:
-      - name: Vérifier Kubernetes
-        run: |
-          echo "=== Version kubectl ==="
-          kubectl version --client
-
-          echo "=== Nœuds Kubernetes ==="
-          kubectl get nodes -o wide
-
-          echo "=== Pods Calico ==="
-          kubectl get pods -n kube-system -l k8s-app=calico-node
-            # ==========================================
-  # 4. Déploiement automatique sur Kubernetes
+  # 3. Déploiement automatique sur Kubernetes
   # ==========================================
   deploy:
     needs: build-image
@@ -118,8 +76,10 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
+
       - name: Vérifier le cluster Kubernetes
-        run: kubectl get nodes
+        run: |
+          kubectl get nodes
 
       - name: Déployer la nouvelle image
         run: |
