@@ -49,6 +49,7 @@ def _charger_commandes_par_defaut():
 
 
 @app.route("/", methods=["GET"])
+@login_required
 def accueil():
     return render_template(
         "index.html",
@@ -103,17 +104,20 @@ def admin_dashboard():
 
 
 @app.route("/historique", methods=["GET"])
+@login_required
 def page_historique():
-    return render_template("historique.html")
+    return render_template("historique.html", user=session.get("user_id"), is_admin=session.get("role") == "admin")
 
 
 @app.route("/categories", methods=["GET"])
+@login_required
 def categories():
     """Pour construire les cases à cocher côté front-end."""
     return jsonify({"categories": liste_categories()})
 
 
 @app.route("/generer-rapport", methods=["POST"])
+@login_required
 def generer_rapport():
 
     fmt = request.args.get("format", "json")  # "json" ou "html"
@@ -154,6 +158,7 @@ def generer_rapport():
 
 
 @app.route("/rapports", methods=["GET"])
+@login_required
 def rapports_disponibles():
     """Liste des dates pour lesquelles un rapport automatique existe déjà."""
     return jsonify({"dates": historique.lister_dates_disponibles()})
@@ -216,6 +221,7 @@ def admin_switch_gemini():
 
 
 @app.route("/rapports/<date>", methods=["GET"])
+@login_required
 def rapport_du_jour(date):
     """Contenu du rapport généré automatiquement à une date donnée (AAAA-MM-JJ)."""
     rapport = historique.charger_rapport(date)
@@ -265,6 +271,7 @@ def _rendre_rapport_html(sections: list[dict]) -> Response:
 
 
 @app.route("/rapport-pdf", methods=["POST"])
+@login_required
 def rapport_pdf():
     """
     Reçoit les sections déjà générées (renvoyées par /generer-rapport) et
@@ -392,6 +399,7 @@ def admin_parametres_page():
 
 
 @app.route("/api/dashboard", methods=["GET"])
+@login_required
 def dashboard_stats():
     dates = historique.lister_dates_disponibles()
     provider = get_parametre("ai_provider", "gemini")
