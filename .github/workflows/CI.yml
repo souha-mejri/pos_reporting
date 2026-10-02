@@ -71,15 +71,10 @@ jobs:
   # ==========================================
   # 3. Déploiement automatique sur Kubernetes
   # ==========================================
-  # Ce job est OPTIONNEL : il ne s'exécute que si un runner self-hosted est disponible
-  # Le pipeline est marqué comme réussi même si ce job est skippé
   deploy:
     needs: build-image
     runs-on: self-hosted
-    if: false  # DÉSACTIVÉ : Changez à true quand le runner est configuré
-    # Pour activer : 
-    #   1. Configurez le runner (voir kubernetes/SETUP_RUNNER.md)
-    #   2. Changez "if: false" en "if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'"
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
 
