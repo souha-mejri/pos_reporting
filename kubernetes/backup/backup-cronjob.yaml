@@ -1,0 +1,67 @@
+# CronJob pour backup quotidien de la base SQLite
+# Sauvegarde tous les jours à 2h du matin
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pos-reporting-backup
+  namespace: pos-reporting
+spec:
+  schedule: "0 2 * * *"  # Tous les jours à 2h du matin
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: alpine:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  # Installer les outils nécessaires
+                  apk add --no-cache tar gzip
+                  
+                  # Créer le backup
+                  DATE=$(date +%Y-%m-%d-%H%M%S)
+                  BACKUP_FILE="/backups/backup-${DATE}.tar.gz"
+                  
+                  echo "📦 Création du backup: ${BACKUP_FILE}"
+                  tar -czf ${BACKUP_FILE} -C /app/data .
+                  
+                  echo "✅ Backup créé avec succès"
+                  ls -lh ${BACKUP_FILE}
+                  
+                  # Supprimer les backups de plus de 30 jours
+                  find /backups -name "backup-*.tar.gz" -mtime +30 -delete
+                  
+                  echo "📊 Backups existants:"
+                  ls -lh /backups/
+              volumeMounts:
+                - name: data
+                  mountPath: /app/data
+                  readOnly: true
+                - name: backups
+                  mountPath: /backups
+          restartPolicy: OnFailure
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: pos-reporting-data
+            - name: backups
+              persistentVolumeClaim:
+                claimName: pos-reporting-backups
+
+---
+# PVC pour stocker les backups
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pos-reporting-backups
+  namespace: pos-reporting
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
